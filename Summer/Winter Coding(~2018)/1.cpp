@@ -16,10 +16,7 @@ int solution(string skill, vector<string> skill_trees)
         vt.push_back(skill[i]);
         st.push(skill[i]);
     }
-    for (int i = 0; i < vt.size(); i++)
-    {
-        cout << vt[i] << " ";
-    }
+
     for (string s : skill_trees)
     {
         stack<char> st_tmp = st;
@@ -48,11 +45,4 @@ int solution(string skill, vector<string> skill_trees)
         }
     }
     return answer;
-}
-
-int main()
-{
-    string skill = "CBD";
-    vector<string> skill_trees = {"BACDE", "CBADF", "AECB", "BDA"};
-    solution(skill, skill_trees);
 }

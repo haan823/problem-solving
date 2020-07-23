@@ -48,21 +48,3 @@ int solution(vector<string> user_id, vector<string> banned_id)
     dfs(user_id, banned_id, 0, 0);
     return s.size();
 }
-int main()
-{
-    vector<string> u, b;
-    u.push_back("frodo");
-    u.push_back("fradi");
-    u.push_back("crodo");
-    u.push_back("abc123");
-    u.push_back("frodoc");
-    b.push_back("fr*d*");
-    b.push_back("*rodo");
-    b.push_back("******");
-    b.push_back("******");
-    solution(u, b);
-    for (int i : s)
-    {
-        cout << i << " ";
-    }
-}
