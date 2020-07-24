@@ -25,12 +25,12 @@ int main()
     {
         for (int j = 1; j < n; j++)
         {
-            if ((map[i][j] == map[i][j - 1] + 1) && (map[i][j] == map[i][j - 2] + 1))
+            if ((map[i][j] == map[i][j - 1] + 1) && (map[i][j] == map[i][j - 2] + 1) && slide[i][j - 2] == 0 && slide[i][j - 1] == 0)
             {
-
                 slide[i][j - 2] = 1;
                 slide[i][j - 1] = 1;
             }
+            else if ()
         }
     }
 }
