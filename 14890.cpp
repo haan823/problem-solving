@@ -23,14 +23,59 @@ int main()
     // row search
     for (int i = 0; i < n; i++)
     {
+        int tmp = map[i][0];
         for (int j = 1; j < n; j++)
         {
-            if ((map[i][j] == map[i][j - 1] + 1) && (map[i][j] == map[i][j - 2] + 1) && slide[i][j - 2] == 0 && slide[i][j - 1] == 0)
+            if (map[i][j] == tmp)
             {
-                slide[i][j - 2] = 1;
-                slide[i][j - 1] = 1;
+                tmp = map[i][j];
+                continue;
             }
-            else if ()
+            else if (map[i][j] == tmp - 1)
+            {
+                if (j + l - 1 < n)
+                {
+                    int tmp2 = map[i][j];
+                    bool flag = false;
+                    for (int k = 0; k < l; k++)
+                    {
+                        if (tmp2 == map[i][j + k] && slide[i][j + k] == 0)
+                        {
+                            flag = true;
+                        }
+                        else
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        for (int k = 0; k < l; k++)
+                        {
+                            slide[i][j + k] = 1;
+                        }
+                        i = j + l - 1;
+                        tmp = tmp - 1;
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else if (map[i][j] == tmp + 1)
+            {
+            }
+            else
+            {
+                break;
+            }
         }
     }
 }
