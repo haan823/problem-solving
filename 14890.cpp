@@ -2,11 +2,11 @@
 
 using namespace std;
 
-int map[100][100];
-int slide[100][100];
+int map1[100][100];
+int map2[100][100];
 int row[100];
 int column[100];
-int n, l, cnt;
+int n, l, cnt, i, j;
 
 int main()
 {
@@ -16,66 +16,66 @@ int main()
     {
         for (int j = 0; j < n; j++)
         {
-            cin >> map[i][j];
+            cin >> map1[i][j];
+            map2[j][i] = map1[i][j];
         }
     }
 
-    // row search
-    for (int i = 0; i < n; i++)
+    for (i = 0; i < n; i++)
     {
-        int tmp = map[i][0];
-        for (int j = 1; j < n; j++)
+        int tmp = 1;
+        for (j = 0; j < n - 1; j++)
         {
-            if (map[i][j] == tmp)
+            if (map1[i][j] == map1[i][j + 1])
             {
-                tmp = map[i][j];
-                continue;
+                tmp++;
             }
-            else if (map[i][j] == tmp - 1)
+            else if (map1[i][j] + 1 == map1[i][j + 1] && tmp >= l)
             {
-                if (j + l - 1 < n)
-                {
-                    int tmp2 = map[i][j];
-                    bool flag = false;
-                    for (int k = 0; k < l; k++)
-                    {
-                        if (tmp2 == map[i][j + k] && slide[i][j + k] == 0)
-                        {
-                            flag = true;
-                        }
-                        else
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag)
-                    {
-                        for (int k = 0; k < l; k++)
-                        {
-                            slide[i][j + k] = 1;
-                        }
-                        i = j + l - 1;
-                        tmp = tmp - 1;
-                        continue;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
+                tmp = 1;
             }
-            else if (map[i][j] == tmp + 1)
+            else if (map1[i][j] - 1 == map1[i][j + 1] && tmp >= 0)
             {
+                tmp = -l + 1;
             }
             else
             {
                 break;
             }
         }
+        if (j == n - 1 && tmp >= 0)
+        {
+            cnt++;
+        }
     }
+
+    for (i = 0; i < n; i++)
+    {
+        int tmp = 1;
+        for (j = 0; j < n - 1; j++)
+        {
+            if (map2[i][j] == map2[i][j + 1])
+            {
+                tmp++;
+            }
+            else if (map2[i][j] + 1 == map2[i][j + 1] && tmp >= l)
+            {
+                tmp = 1;
+            }
+            else if (map2[i][j] - 1 == map2[i][j + 1] && tmp >= 0)
+            {
+                tmp = -l + 1;
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (j == n - 1 && tmp >= 0)
+        {
+            cnt++;
+        }
+    }
+
+    cout << cnt;
 }
