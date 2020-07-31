@@ -1,10 +1,15 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-int n, m;
+int n, m, cnt = 987654321;
 int map[8][8];
 int tmp_map[8][8];
+vector<int> start;
+vector<int> last;
+vector<pair<int, pair<int, int>>> to_do;
 
 void map_to_tmp()
 {
@@ -56,7 +61,7 @@ void right(int x, int y)
 
 void down(int x, int y)
 {
-    for (int i = x; i >= 0; i--)
+    for (int i = x; i < n; i++)
     {
         if (tmp_map[i][y] == 0)
         {
@@ -115,9 +120,19 @@ int main()
             cin >> map[i][j];
             if (map[i][j] > 0 && map[i][j] < 6)
             {
+                to_do.push_back(make_pair(map[i][j], make_pair(i, j)));
             }
         }
     }
 
     map_to_tmp();
+
+    int size = to_do.size();
+    for (int i = 0; i < to_do.size(); i++)
+    {
+    }
+    do
+    {
+        cout <<
+    } while (next_permutation(start, last));
 }
