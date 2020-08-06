@@ -1,112 +1,135 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <queue>
 
 using namespace std;
 
-int n, m, cnt = 987654321;
-int map[8][8];
-int tmp_map[8][8];
-vector<int> start;
-vector<int> last;
-vector<pair<int, pair<int, int>>> to_do;
+int n, m;
+vector<vector<int>> map;
+int min_num = 987654321;
+int dx[4] = {-1, 0, 1, 0};
+int dy[4] = {0, 1, 0, -1};
+int total_cctv_num;
+vector<vector<int>> cctv_loc;
 
-void map_to_tmp()
+bool is_in_board(int x, int y)
 {
+    if (x >= 0 && x < n && y >= 0 && y < m)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+int sagak(vector<vector<int>> board) // 사각 지대 카운트
+{
+    int cnt = 0;
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
         {
-            tmp_map[i][j] = map[i][j];
+            if (board[i][j] == 0)
+            {
+                cnt++;
+            }
         }
     }
+    return cnt;
 }
-void up(int x, int y)
+
+vector<vector<int>> cctv(vector<vector<int>> board, int x, int y, int dir)
 {
-    for (int i = x; i >= 0; i--)
+    vector<vector<int>> next_board = board;
+    int cx = x;
+    int cy = y;
+    int nx, ny;
+
+    while (true)
     {
-        if (tmp_map[i][y] == 0)
+        nx = cx + dx[dir];
+        ny = cy + dy[dir];
+        if (is_in_board(nx, ny))
         {
-            tmp_map[i][y] = 7;
-        }
-        else if (tmp_map[x][i] == 6)
-        {
-            break;
+            if (board[nx][ny] == 0)
+            {
+                next_board[nx][ny] = 9;
+                cx = nx;
+                cy = ny;
+            }
+            else if (board[nx][ny] >= 1 && board[nx][ny] < 6)
+            {
+                cx = nx;
+                cy = ny;
+                continue;
+            }
+            else if (board[nx][ny] == 6)
+            {
+                break;
+            }
+            else
+            {
+                cx = nx;
+                cy = ny;
+                continue;
+            }
         }
         else
         {
-            continue;
-        }
-    }
-}
-
-void right(int x, int y)
-{
-    for (int i = y; i < m; i++)
-    {
-        if (tmp_map[x][i] == 0)
-        {
-            tmp_map[x][i] = 7;
-        }
-        else if (tmp_map[x][i] == 6)
-        {
             break;
         }
-        else
-        {
-            continue;
-        }
+    }
+
+    return next_board;
+}
+
+vector<vector<int>> cctv2(vector<vector<int>> board, int x, int y, int cctv_num, int k)
+{
+    if (cctv_num == 1)
+    {
+        return cctv(board, x, y, k);
+    }
+    else if (cctv_num == 2)
+    {
+        vector<vector<int>> tmp = cctv(board, x, y, k);
+        return cctv(tmp, x, y, (k + 2) % 4);
+    }
+    else if (cctv_num == 3)
+    {
+        vector<vector<int>> tmp = cctv(board, x, y, k);
+        return cctv(tmp, x, y, (k + 1) % 4);
+    }
+    else if (cctv_num == 4)
+    {
+        vector<vector<int>> tmp = cctv(board, x, y, k);
+        tmp = cctv(tmp, x, y, (k + 1) % 4);
+        return cctv(tmp, x, y, (k + 3) % 4);
+    }
+    else
+    {
+        vector<vector<int>> tmp = cctv(board, x, y, k);
+        tmp = cctv(tmp, x, y, (k + 1) % 4);
+        tmp = cctv(tmp, x, y, (k + 2) % 4);
+        return cctv(tmp, x, y, (k + 3) % 4);
     }
 }
 
-void down(int x, int y)
+void dfs(vector<vector<int>> board, int cnt)
 {
-    for (int i = x; i < n; i++)
+    if (cnt == total_cctv_num)
     {
-        if (tmp_map[i][y] == 0)
+        if (sagak(board) < min_num)
         {
-            tmp_map[i][y] = 7;
+            min_num = sagak(board);
         }
-        else if (tmp_map[x][i] == 6)
-        {
-            break;
-        }
-        else
-        {
-            continue;
-        }
+        return;
     }
-}
-
-void left(int x, int y)
-{
-    for (int i = y; i >= 0; i--)
+    for (int i = 0; i < 4; i++)
     {
-        if (tmp_map[x][i] == 0)
-        {
-            tmp_map[x][i] = 7;
-        }
-        else if (tmp_map[x][i] == 6)
-        {
-            break;
-        }
-        else
-        {
-            continue;
-        }
-    }
-}
-
-void cctv(int num, int x, int y, int dir)
-{
-    if (num == 1)
-    {
-        if (dir == 0)
-        {
-        }
-        else if (dir == 1)
-        {
-        }
+        vector<vector<int>> next_board = cctv2(board, cctv_loc[cnt][1], cctv_loc[cnt][2], cctv_loc[cnt][0], i);
+        dfs(next_board, cnt + 1);
     }
 }
 
@@ -115,24 +138,23 @@ int main()
     cin >> n >> m;
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < n; j++)
+        vector<int> tmp_v;
+        for (int j = 0; j < m; j++)
         {
-            cin >> map[i][j];
-            if (map[i][j] > 0 && map[i][j] < 6)
+            int tmp;
+            cin >> tmp;
+            tmp_v.push_back(tmp);
+            if (tmp >= 1 && tmp < 6)
             {
-                to_do.push_back(make_pair(map[i][j], make_pair(i, j)));
+                cctv_loc.push_back({tmp, i, j});
             }
         }
+        map.push_back(tmp_v);
     }
 
-    map_to_tmp();
+    total_cctv_num = cctv_loc.size();
 
-    int size = to_do.size();
-    for (int i = 0; i < to_do.size(); i++)
-    {
-    }
-    do
-    {
-        cout <<
-    } while (next_permutation(start, last));
+    dfs(map, 0);
+
+    cout << min_num;
 }
