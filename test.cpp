@@ -1,17 +1,27 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-int c = 0;
+vector<vector<int>> start = {{0, 0, 0}, {0, 0, 0}, {0, 0, 1}};
 
 int main()
 {
-    int a = 1;
-    int b = 2;
-    int c = 3;
-    int d = a + b + c;
-
-    cout << a << " + " << b << " + " << c << " = " << d << endl;
-
-    return 0;
+    int k=2;
+    do
+    {
+        do
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    cout << start[i][j] << " ";
+                }
+                cout << "\n";
+            }
+        }while(next_permutation(start[k].begin(), start[k].end()));
+        k--;
+    } while (next_permutation(start.begin(), start.end()));
 }
