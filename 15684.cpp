@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <stack>
 
 using namespace std;
 
@@ -8,79 +7,66 @@ int n, m, h; // 세로선, 가로선, 높이
 int min_num = 987654321;
 vector<vector<int>> map;
 
-// 들어가는 곳으로 나오는지 확인
-bool sadari(vector<vector<int>> &board, int &index)
+bool sadari2()
 {
-    int current_index = index;
-    for (int i = 1; i <= h; i++)
-    {
-        if (board[i][current_index] == 1)
-        {
-            current_index++;
-        }
-        else if (board[i][current_index] == -1)
-        {
-            current_index--;
-        }
-    }
-    return index == current_index;
-}
-
-bool sadari2(vector<vector<int>> &board)
-{
-    bool flag = false;
     for (int i = 1; i <= n; i++)
     {
-        if (sadari(board, i))
+        int k = i;
+        for (int j = 1; j <= h; j++)
         {
-            flag = true;
+            if (map[j][k])
+            {
+                k++;
+            }
+            else if (k > 1 && map[j][k - 1])
+            {
+                k--;
+            }
         }
-        else
+        if (i != k)
         {
-            flag = false;
-            break;
+            return false;
         }
     }
-    return flag;
+    return true;
 }
 
-int bfs(vector<vector<int>> &board)
+void dfs(pair<int, int> visit, int depth)
 {
-    stack<pair<vector<vector<int>>, int>> q;
-    q.push(make_pair(board, 0));
-
-    while (!q.empty())
+    if (depth >= min_num)
     {
-        pair<vector<vector<int>>, int> current_board;
-        current_board = q.top();
-        q.pop();
-
-        if (sadari2(current_board.first))
+        return;
+    }
+    else if (sadari2())
+    {
+        if (depth < min_num)
         {
-            if (current_board.second < min_num)
-            {
-                return current_board.second;
-            }
+            min_num = depth;
+            return;
         }
-        if (current_board.second < 3)
+    }
+    if (depth == 3)
+    {
+        return;
+    }
+    int x = visit.first;
+    int y = visit.second + 2;
+    for (int i = x; i <= h; i++, y = 1)
+    {
+        for (int j = y; j < n; j++)
         {
-            for (int i = 1; i <= h; i++)
+            if (map[i][j] == 1)
             {
-                for (int j = 1; j < n; j++)
-                {
-                    if (current_board.first[i][j] == 0 && current_board.first[i][j + 1] == 0)
-                    {
-                        vector<vector<int>> next_board = current_board.first;
-                        next_board[i][j] = 1;
-                        next_board[i][j + 1] = -1;
-                        q.push(make_pair(next_board, current_board.second + 1));
-                    }
-                }
+                j++;
+            }
+            else
+            {
+                map[i][j] = 1;
+                dfs({i, j}, depth + 1);
+                map[i][j] = 0;
             }
         }
     }
-
-    return -1;
 }
 
 int main()
@@ -101,10 +87,15 @@ int main()
         int x, y;
         cin >> x >> y;
         map[x][y] = 1;
-        map[x][y + 1] = -1;
     }
 
-    int answer = bfs(map);
-
-    cout << answer;
+    dfs({1, -1}, 0);
+    if (min_num == 987654321)
+    {
+        cout << -1;
+    }
+    else
+    {
+        cout << min_num;
+    }
 }
