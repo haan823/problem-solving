@@ -1,27 +1,105 @@
-#include <iostream>
+#include <string>
 #include <vector>
-#include <algorithm>
+#include <iostream>
 
 using namespace std;
 
-vector<vector<int>> start = {{0, 0, 0}, {0, 0, 0}, {0, 0, 1}};
+int n;
+vector<vector<int>> network;
+vector<vector<int>> repair;
+vector<int> map;
+
+int find(vector<int> &parent, int x)
+{
+    if (x == parent[x])
+    {
+        return x;
+    }
+    else
+    {
+        return find(parent, parent[x]);
+    }
+}
+
+void union_find(vector<int> &parent, int x, int y)
+{
+    x = find(parent, x);
+    y = find(parent, y);
+
+    if (x != y)
+    {
+        if (x < y)
+        {
+            parent[y] = x;
+        }
+        else
+        {
+            parent[x] = y;
+        }
+    }
+}
+
+bool sameparent(vector<int> &parent, int x, int y)
+{
+    x = find(parent, x);
+    y = find(parent, y);
+
+    if (x == y)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool is_connected(vector<vector<int>> network)
+{
+    vector<int> u;
+    for (int i = 0; i <= n; i++)
+    {
+        u.push_back(i);
+    }
+    for (int i = 0; i < network.size(); i++)
+    {
+        union_find(u, network[i][0], network[i][1]);
+    }
+    for (int i = 1; i < n; i++)
+    {
+        if (find(u, i) == find(u, i + 1))
+        {
+            continue;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int solution(int n, vector<vector<int>> network, vector<vector<int>> repair)
+{
+    int answer = -2;
+
+    if (is_connected(network))
+    {
+        answer = 1;
+    }
+    else
+    {
+        answer = -1;
+    }
+
+    return answer;
+}
 
 int main()
 {
-    int k=2;
-    do
-    {
-        do
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    cout << start[i][j] << " ";
-                }
-                cout << "\n";
-            }
-        }while(next_permutation(start[k].begin(), start[k].end()));
-        k--;
-    } while (next_permutation(start.begin(), start.end()));
+    n = 6;
+    network = {{1, 2}, {3, 5}, {4, 2}, {5, 6}};
+    repair = {{3, 2, 10}, {5, 4, 15}};
+
+    cout << solution(n, network, repair);
 }
