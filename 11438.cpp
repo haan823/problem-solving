@@ -3,8 +3,9 @@
 
 using namespace std;
 
-int n, m, a, b, d[100001][17], l[10001];
+int n, m, a, b, d[100001][17], l[100001];
 vector<int> v[100001];
+vector<int> answer;
 
 void dfs(int p, int f){
     for(int i=0; i<v[p].size(); i++){
@@ -16,8 +17,8 @@ void dfs(int p, int f){
         d[c][0] = p;
         for(int j=1; j<17; j++){
             d[c][j] = d[d[c][j-1]][j-1];
-            dfs(c, p);
         }
+        dfs(c, p);
     }
 }
 
@@ -51,7 +52,10 @@ int main(){
     scanf("%d", &m);
     while(m--){
         scanf("%d %d", &a, &b);
-        printf("%d\n", lca(a, b));
+        answer.push_back(lca(a, b));
+    }
+    for(int i=0; i<answer.size(); i++){
+        printf("%d\n", answer[i]);
     }
     return 0;
 }
