@@ -1,7 +1,7 @@
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-#include <set>
 #include <algorithm>
 
 using namespace std;
@@ -34,24 +34,6 @@ string lower(string &s)
     return s;
 }
 
-int find_word(string word, string page)
-{
-    page = lower(page);
-    int cnt = 0;
-    while (page.find(word) != string::npos)
-    {
-        int start_pos = page.find(word);
-        int end_pos = start_pos + word.size() - 1;
-        cnt++;
-        if ((start_pos - 1 >= 0 && page[start_pos - 1] >= 'a' && page[start_pos - 1] <= 'Z') || (end_pos + 1 <= page.size() - 1 && page[end_pos + 1] >= 'a' && page[end_pos + 1] <= 'Z'))
-        {
-            cnt--;
-        }
-        page = page.substr(end_pos + 1);
-    }
-    return cnt;
-}
-
 int solution(string word, vector<string> pages)
 {
     int answer = 0, max_num = 0;
@@ -78,7 +60,7 @@ int solution(string word, vector<string> pages)
             st[i].push_back(m[tmp]);
         }
         // word
-        page = lower(page);
+        string page = lower(pages[i]);
         int cnt = 0;
         while (page.find(word) != string::npos)
         {
@@ -91,8 +73,7 @@ int solution(string word, vector<string> pages)
             }
             page = page.substr(end_pos + 1);
         }
-        return cnt;
-        score[i].push_back(find_word(word, pages[i]));
+        score[i].push_back(cnt);
         score[i].push_back(0);
     }
 
@@ -120,4 +101,11 @@ int solution(string word, vector<string> pages)
     sort(result.begin(), result.end(), compare);
     answer = result.front().first;
     return answer;
+}
+
+int main()
+{
+    string word;
+    vector<string> pages;
+    cout << solution(word, pages);
 }
