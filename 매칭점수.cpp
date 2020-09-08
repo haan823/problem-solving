@@ -22,7 +22,7 @@ bool compare(pair<int, int> &a, pair<int, int> &b)
         return a.second > b.second;
     }
 }
-string lower(string &s)
+string lower(string &s) // 소문자로 변환
 {
     for (int i = 0; i < s.size(); i++)
     {
