@@ -23,24 +23,11 @@ struct compare
     }
 };
 
-void print()
-{
-    for (int i = 1; i <= 10; i++)
-    {
-        for (int j = 1; j <= 10; j++)
-        {
-            cout << map[i][j] << " ";
-        }
-        cout << "\n";
-    }
-    cout << "----------------------------------------------------------\n";
-}
-
 void solution()
 {
-    while (t<=100)
+    while (t <= 100)
     {
-        
+
         if (map[r][c] == k)
         {
             cout << t;
