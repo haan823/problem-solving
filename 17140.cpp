@@ -4,143 +4,182 @@
 
 using namespace std;
 
-int r, c, k, rn = 3, cn = 3;
-int map[100][100];
+int r, c, k, t, rnum = 3, cnum = 3;
+int map[101][101];
+priority_queue<pair<int, int>> pq;
 
-vector<int> sort(vector<int> v)
+struct compare
 {
-    int tmp[101] = {
-        0,
-    };
-    for (int i = 0; i < v.size(); i++)
+    bool operator()(pair<int, int> &a, pair<int, int> &b)
     {
-        tmp[v[i]]++;
-    }
-    priority_queue<int, vector<int>, greater<int>> pq[101];
-    for (int i = 1; i <= 100; i++)
-    {
-        if (tmp[i] != 0)
+        if (a.second == b.second)
         {
-            pq[tmp[i]].push(i);
-        }
-    }
-    vector<int> res;
-    for (int i = 1; i <= 100; i++)
-    {
-        int s = pq[i].size();
-        for (int j = 0; j < s; j++)
-        {
-            res.push_back(pq[i].top());
-            res.push_back(i);
-            pq[i].pop();
-        }
-    }
-    return res;
-}
-
-void r_calc()
-{
-    int nxt_cn = cn;
-    for (int i = 0; i < rn; i++)
-    {
-        vector<int> cur_row;
-        for (int j = 0; j < cn; j++)
-        {
-            cur_row.push_back(map[i][j]);
-        }
-        vector<int> nxt_row = sort(cur_row);
-        if (nxt_row.size() > 100)
-        {
-            for (int j = 0; j < 100; j++)
-            {
-                map[i][j] = nxt_row[j];
-            }
-            nxt_cn = 100;
+            return a.first > b.first;
         }
         else
         {
-            for (int j = 0; j < nxt_row.size(); j++)
-            {
-                map[i][j] = nxt_row[j];
-            }
-            if (nxt_row.size() > nxt_cn)
-            {
-                nxt_cn = nxt_row.size();
-            }
+            return a.second > b.second;
         }
     }
-    cn = nxt_cn;
+};
+
+void print()
+{
+    for (int i = 1; i <= 10; i++)
+    {
+        for (int j = 1; j <= 10; j++)
+        {
+            cout << map[i][j] << " ";
+        }
+        cout << "\n";
+    }
+    cout << "----------------------------------------------------------\n";
 }
 
-void c_calc()
+void solution()
 {
-    int nxt_rn = rn;
-    for (int i = 0; i < cn; i++)
+    while (t<=100)
     {
-        vector<int> cur_column;
-        for (int j = 0; j < rn; j++)
+        
+        if (map[r][c] == k)
         {
-            cur_column.push_back(map[j][i]);
+            cout << t;
+            return;
         }
-        vector<int> nxt_column = sort(cur_column);
-        if (nxt_column.size() > 100)
-        {
-            for (int j = 0; j < 100; j++)
-            {
-                map[j][i] = nxt_column[j];
-            }
-            nxt_rn = 100;
-        }
-        else
-        {
-            for (int j = 0; j < nxt_column.size(); j++)
-            {
-                map[i][j] = nxt_column[j];
-            }
-            if (nxt_column.size() > nxt_rn)
-            {
-                nxt_rn = nxt_column.size();
-            }
-        }
-    }
-    rn = nxt_rn;
-}
 
-void solve()
-{
-    if (rn >= cn)
-    {
-        r_calc();
+        if (rnum >= cnum)
+        {
+            int new_cnum = 0;
+            for (int i = 1; i <= rnum; i++)
+            {
+                int current_cnum;
+                vector<int> cnt(101, 0);
+                priority_queue<pair<int, int>, vector<pair<int, int>>, compare> pq;
+                for (int j = 1; j <= cnum; j++)
+                {
+                    if (map[i][j] != 0)
+                    {
+                        cnt[map[i][j]]++;
+                    }
+                }
+                for (int j = 1; j <= 100; j++)
+                {
+                    if (cnt[j] != 0)
+                    {
+                        pq.push(make_pair(j, cnt[j]));
+                    }
+                }
+                vector<int> tmp;
+                while (!pq.empty())
+                {
+                    tmp.push_back(pq.top().first);
+                    tmp.push_back(pq.top().second);
+                    pq.pop();
+                }
+                if (tmp.size() > 100)
+                {
+                    for (int j = 1; j <= 100; j++)
+                    {
+                        map[i][j] = tmp[j - 1];
+                    }
+                    current_cnum = 100;
+                }
+                else
+                {
+                    for (int j = 1; j <= tmp.size(); j++)
+                    {
+                        map[i][j] = tmp[j - 1];
+                    }
+                    current_cnum = tmp.size();
+                    if (current_cnum < cnum)
+                    {
+                        for (int j = current_cnum + 1; j <= cnum; j++)
+                        {
+                            map[i][j] = 0;
+                        }
+                    }
+                }
+                if (current_cnum > new_cnum)
+                {
+                    new_cnum = current_cnum;
+                }
+            }
+            cnum = new_cnum;
+        }
+        else if (rnum < cnum)
+        {
+            int new_rnum = 0;
+            for (int i = 1; i <= cnum; i++)
+            {
+                int current_rnum;
+                vector<int> cnt(101, 0);
+                priority_queue<pair<int, int>, vector<pair<int, int>>, compare> pq;
+                for (int j = 1; j <= rnum; j++)
+                {
+                    if (map[j][i] != 0)
+                    {
+                        cnt[map[j][i]]++;
+                    }
+                }
+                for (int j = 1; j <= 100; j++)
+                {
+                    if (cnt[j] != 0)
+                    {
+                        pq.push(make_pair(j, cnt[j]));
+                    }
+                }
+                vector<int> tmp;
+                while (!pq.empty())
+                {
+                    tmp.push_back(pq.top().first);
+                    tmp.push_back(pq.top().second);
+                    pq.pop();
+                }
+                if (tmp.size() > 100)
+                {
+                    for (int j = 1; j <= 100; j++)
+                    {
+                        map[j][i] = tmp[j - 1];
+                    }
+                    current_rnum = 100;
+                }
+                else
+                {
+                    for (int j = 1; j <= tmp.size(); j++)
+                    {
+                        map[j][i] = tmp[j - 1];
+                    }
+                    current_rnum = tmp.size();
+                    if (current_rnum < rnum)
+                    {
+                        for (int j = current_rnum + 1; j <= rnum; j++)
+                        {
+                            map[j][i] = 0;
+                        }
+                    }
+                }
+                if (current_rnum > new_rnum)
+                {
+                    new_rnum = current_rnum;
+                }
+            }
+            rnum = new_rnum;
+        }
+        t++;
     }
-    else
-    {
-        c_calc();
-    }
+    cout << -1;
+    return;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
     cin >> r >> c >> k;
-    for (int i = 0; i < 3; i++)
+    for (int i = 1; i <= 3; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 1; j <= 3; j++)
         {
             cin >> map[i][j];
         }
     }
-    int cnt = 0;
-    while(true){
-        if(cnt > 100){
-            cout << -1;
-            return 0;
-        }
-        if(map[r-1][c-1] == k){
-            cout << cnt;
-            return 0;
-        }
-        solve();
-        cnt++;
-    }
+    solution();
 }
