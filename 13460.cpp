@@ -1,365 +1,166 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <vector>
-#include <queue>
-#include <stack>
-#include <algorithm>
+
 using namespace std;
 
-char board[10][10];
-char status[10][10][10][10];
-pair<int, int> red;
-pair<int, int> blue;
-pair<int, int> goal;
-queue<pair<int, pair<pair<int, int>, pair<int, int>>>> s;
+int n, m, res = 987654321;
+int map[10][10];
+int rx, ry, bx, by, gx, gy;
+int dx[4] = { -1, 0, 1, 0 };
+int dy[4] = { 0, 1, 0, -1 };
 
-pair<pair<int, int>, pair<int, int>> right(pair<pair<int, int>, pair<int, int>> now)
+void dfs(int cnt, int rx, int ry, int bx, int by, int status) // status : 0=nothing, 1=red, 2=blue, 3=both, 4=nothing changed
 {
-    pair<pair<int, int>, pair<int, int>> tmp = now;
-    bool red_goal = false;
-    bool blue_goal = false;
-    while (true)
-    {
-        if (board[tmp.first.first][tmp.first.second + 1] == '#' && board[tmp.second.first][tmp.second.second + 1] == '#')
-        {
-            break;
-        }
-        else if(red_goal && blue_goal){
-            break;
-        }
-        else if(board[tmp.first.first][tmp.first.second + 1] == '#' && blue_goal){
-            break;
-        }
-        else if(board[tmp.second.first][tmp.second.second + 1] == '#' && red_goal){
-            break;
-        }
-        if (board[tmp.first.first][tmp.first.second + 1] != '#' && !red_goal)
-        {
-            tmp.first.second++;
-        }
-        if (board[tmp.second.first][tmp.second.second + 1] != '#' && !blue_goal)
-        {
-            tmp.second.second++;
-        }
-        if (tmp.first.first == goal.first && tmp.first.second == goal.second)
-        {
-            red_goal = true;
-        }
-        if (tmp.second.first == goal.first && tmp.second.second == goal.second)
-        {
-            blue_goal = true;
-        }
+    if (cnt > 10) {
+        return;
     }
-    if(red_goal && blue_goal){
-        return tmp;
+    else if (status == 1) {
+        if (cnt < res) {
+            res = cnt;
+        }
+        return;
     }
-    else if (tmp.first.first == tmp.second.first && tmp.first.second == tmp.second.second)
-    {
-        if (now.first.second < now.second.second)
-        {
-            tmp.first.second--;
-            return tmp;
-        }
-        else if (now.first.second > now.second.second)
-        {
-            tmp.second.second--;
-            return tmp;
-        }
+    else if (status == 2 || status == 3) {
+        return;
     }
-    else
-    {
-        return tmp;
-    }
-}
-
-pair<pair<int, int>, pair<int, int>> left(pair<pair<int, int>, pair<int, int>> now)
-{
-    pair<pair<int, int>, pair<int, int>> tmp = now;
-    bool red_goal = false;
-    bool blue_goal = false;
-    while (true)
-    {
-        if (board[tmp.first.first][tmp.first.second - 1] == '#' && board[tmp.second.first][tmp.second.second - 1] == '#')
-        {
-            break;
+    else if (status == 0) {
+        for (int i = 0; i < 4; i++) {
+            int nrx = rx, nry = ry, nbx = bx, nby = by, nstatus;
+            vector<pair<int, int>> red, blue;
+            while (true) {
+                if (nrx >= 0 && nrx < n && nry >= 0 && nry < m && map[nrx][nry] == 0) {
+                    red.push_back({ nrx, nry });
+                    nrx += dx[i];
+                    nry += dy[i];
+                }
+                else {
+                    nrx -= dx[i];
+                    nry -= dy[i];
+                    break;
+                }
+            }
+            while (true) {
+                if (nbx >= 0 && nbx < n && nby >= 0 && nby < m && map[nbx][nby] == 0) {
+                    blue.push_back({ nbx, nby });
+                    nbx += dx[i];
+                    nby += dy[i];
+                }
+                else {
+                    nbx -= dx[i];
+                    nby -= dy[i];
+                    break;
+                }
+            }
+            if (nrx == nbx && nry == nby) {
+                if (i == 0) {
+                    if (rx < bx) {
+                        nbx++;
+                    }
+                    else if (rx > bx) {
+                        nrx++;
+                    }
+                }
+                else if (i == 1) {
+                    if (ry < by) {
+                        nry--;
+                    }
+                    else if (ry > by) {
+                        nby--;
+                    }
+                }
+                else if (i == 2) {
+                    if (rx < bx) {
+                        nrx--;
+                    }
+                    else if (rx > bx) {
+                        nbx--;
+                    }
+                }
+                else if (i == 3) {
+                    if (ry < by) {
+                        nby++;
+                    }
+                    else if (ry > by) {
+                        nry++;
+                    }
+                }
+            }
+            bool flag1 = false, flag2 = false;
+            for (int i = 0; i < red.size(); i++) {
+                if (red[i].first == gx && red[i].second == gy) {
+                    flag1 = true;
+                }
+            }
+            for (int i = 0; i < blue.size(); i++) {
+                if (blue[i].first == gx && blue[i].second == gy) {
+                    flag2 = true;
+                }
+            }
+            if (!flag1 && !flag2) {
+                nstatus = 0;
+            }
+            else if (flag1 && !flag2) {
+                nstatus = 1;
+            }
+            else if (!flag1 && flag2) {
+                nstatus = 2;
+            }
+            else if (flag1 && flag2) {
+                nstatus = 3;
+            }
+            if (rx == nrx && ry == nry && bx == nbx && by == nby) {
+                continue;
+            }
+            dfs(cnt + 1, nrx, nry, nbx, nby, nstatus);
         }
-        else if(red_goal && blue_goal){
-            break;
-        }
-        else if(board[tmp.first.first][tmp.first.second + 1] == '#' && blue_goal){
-            break;
-        }
-        else if(board[tmp.second.first][tmp.second.second + 1] == '#' && red_goal){
-            break;
-        }
-        if (board[tmp.first.first][tmp.first.second - 1] != '#' && !red_goal)
-        {
-            tmp.first.second--;
-        }
-        if (board[tmp.second.first][tmp.second.second - 1] != '#' && !blue_goal)
-        {
-            tmp.second.second--;
-        }
-        if (tmp.first.first == goal.first && tmp.first.second == goal.second)
-        {
-            red_goal = true;
-        }
-        if (tmp.second.first == goal.first && tmp.second.second == goal.second)
-        {
-            blue_goal = true;
-        }
-    }
-    if(red_goal && blue_goal){
-        return tmp;
-    }
-    else if (tmp.first.first == tmp.second.first && tmp.first.second == tmp.second.second)
-    {
-        if (now.first.second < now.second.second)
-        {
-            tmp.second.second++;
-            return tmp;
-        }
-        else if (now.first.second > now.second.second)
-        {
-            tmp.first.second++;
-            return tmp;
-        }
-    }
-    else
-    {
-        return tmp;
-    }
-}
-
-pair<pair<int, int>, pair<int, int>> up(pair<pair<int, int>, pair<int, int>> now)
-{
-    pair<pair<int, int>, pair<int, int>> tmp = now;
-    bool red_goal = false;
-    bool blue_goal = false;
-    while (true)
-    {
-        if (board[tmp.first.first - 1][tmp.first.second] == '#' && board[tmp.second.first - 1][tmp.second.second] == '#')
-        {
-            break;
-        }
-        else if(red_goal && blue_goal){
-            break;
-        }
-        else if(board[tmp.first.first][tmp.first.second + 1] == '#' && blue_goal){
-            break;
-        }
-        else if(board[tmp.second.first][tmp.second.second + 1] == '#' && red_goal){
-            break;
-        }
-        if (board[tmp.first.first - 1][tmp.first.second] != '#' && !red_goal)
-        {
-            tmp.first.first--;
-        }
-        if (board[tmp.second.first - 1][tmp.second.second] != '#' && !blue_goal)
-        {
-            tmp.second.first--;
-        }
-        if (tmp.first.first == goal.first && tmp.first.second == goal.second)
-        {
-            red_goal = true;
-        }
-        if (tmp.second.first == goal.first && tmp.second.second == goal.second)
-        {
-            blue_goal = true;
-        }
-    }
-    if(red_goal && blue_goal){
-        return tmp;
-    }
-    else if (tmp.first.first == tmp.second.first && tmp.first.second == tmp.second.second)
-    {
-        if (now.first.first < now.second.first)
-        {
-            tmp.second.first++;
-            return tmp;
-        }
-        else if (now.first.first > now.second.first)
-        {
-            tmp.first.first++;
-            return tmp;
-        }
-    }
-    else
-    {
-        return tmp;
-    }
-}
-
-pair<pair<int, int>, pair<int, int>> down(pair<pair<int, int>, pair<int, int>> now)
-{
-    pair<pair<int, int>, pair<int, int>> tmp = now;
-    bool red_goal = false;
-    bool blue_goal = false;
-    while (true)
-    {
-        if (board[tmp.first.first + 1][tmp.first.second] == '#' && board[tmp.second.first + 1][tmp.second.second] == '#')
-        {
-            break;
-        }
-        else if(red_goal && blue_goal){
-            break;
-        }
-        else if(board[tmp.first.first][tmp.first.second + 1] == '#' && blue_goal){
-            break;
-        }
-        else if(board[tmp.second.first][tmp.second.second + 1] == '#' && red_goal){
-            break;
-        }
-        if (board[tmp.first.first + 1][tmp.first.second] != '#' && !red_goal)
-        {
-            tmp.first.first++;
-        }
-        if (board[tmp.second.first + 1][tmp.second.second] != '#' && !blue_goal)
-        {
-            tmp.second.first++;
-        }
-        if (tmp.first.first == goal.first && tmp.first.second == goal.second)
-        {
-            red_goal = true;
-        }
-        if (tmp.second.first == goal.first && tmp.second.second == goal.second)
-        {
-            blue_goal = true;
-        }
-    }
-    if(red_goal && blue_goal){
-        return tmp;
-    }
-    else if (tmp.first.first == tmp.second.first && tmp.first.second == tmp.second.second)
-    {
-        if (now.first.first < now.second.first)
-        {
-            tmp.second.first--;
-            return tmp;
-        }
-        else if (now.first.first > now.second.first)
-        {
-            tmp.first.first--;
-            return tmp;
-        }
-    }
-    else
-    {
-        return tmp;
     }
 }
 
 int main()
 {
-    int n, m;
+    ios::sync_with_stdio(false);
+    cin.tie(0);
     cin >> n >> m;
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
         {
-            cin >> board[i][j];
-            if (board[i][j] == 'R')
+            char tmp;
+            cin >> tmp;
+            if (tmp == '#')
             {
-                red = make_pair(i, j);
+                map[i][j] = 1;
             }
-            else if (board[i][j] == 'B')
+            else if (tmp == '.')
             {
-                blue = make_pair(i, j);
+                map[i][j] = 0;
             }
-            else if (board[i][j] == 'O')
+            else if (tmp == 'R')
             {
-                goal = make_pair(i, j);
+                map[i][j] = 0;
+                rx = i;
+                ry = j;
             }
-        }
-    }
-
-    pair<pair<int, int>, pair<int, int>> now = make_pair(red, blue);
-
-    s.push(make_pair(0, now));
-    while (!s.empty())
-    {
-        pair<pair<int, int>, pair<int, int>> tmp;
-        pair<pair<int, int>, pair<int, int>> after_right;
-        pair<pair<int, int>, pair<int, int>> after_left;
-        pair<pair<int, int>, pair<int, int>> after_up;
-        pair<pair<int, int>, pair<int, int>> after_down;
-        tmp = s.front().second;
-        int cnt = s.front().first;
-        s.pop();
-        status[tmp.first.first][tmp.first.second][tmp.second.first][tmp.second.second] = 1;
-        cnt++;
-        if (cnt <= 10)
-        {
-            after_right = right(tmp);
-            if (status[after_right.first.first][after_right.first.second][after_right.second.first][after_right.second.second] == 0)
+            else if (tmp == 'B')
             {
-                if (after_right.second.first == goal.first && after_right.second.second == goal.second)
-                {
-                    printf("-1");
-                    return 0;
-                }
-                else if (after_right.first.first == goal.first && after_right.first.second == goal.second)
-                {
-                    printf("%d", cnt);
-                    return 0;
-                }
-                else
-                {
-                    s.push(make_pair(cnt, after_right));
-                }
+                map[i][j] = 0;
+                bx = i;
+                by = j;
             }
-            after_left = left(tmp);
-            if (status[after_left.first.first][after_left.first.second][after_left.second.first][after_left.second.second] == 0)
+            else if (tmp == 'O')
             {
-                if (after_left.second.first == goal.first && after_left.second.second == goal.second)
-                {
-                    printf("-1");
-                    return 0;
-                }
-                else if (after_left.first.first == goal.first && after_left.first.second == goal.second)
-                {
-                    printf("%d", cnt);
-                    return 0;
-                }
-                else
-                {
-                    s.push(make_pair(cnt, after_left));
-                }
-            }
-            after_up = up(tmp);
-            if (status[after_up.first.first][after_up.first.second][after_up.second.first][after_up.second.second] == 0)
-            {
-                if (after_up.second.first == goal.first && after_up.second.second == goal.second)
-                {
-                    printf("-1");
-                    return 0;
-                }
-                else if (after_up.first.first == goal.first && after_up.first.second == goal.second)
-                {
-                    printf("%d", cnt);
-                    return 0;
-                }
-                else
-                {
-                    s.push(make_pair(cnt, after_up));
-                }
-            }
-            after_down = down(tmp);
-            if (status[after_down.first.first][after_down.first.second][after_down.second.first][after_down.second.second] == 0)
-            {
-                if (after_down.second.first == goal.first && after_down.second.second == goal.second) {
-                    printf("-1");
-                    return 0;
-                }
-                else if (after_down.first.first == goal.first && after_down.first.second == goal.second) {
-                    printf("%d", cnt);
-                    return 0;
-                }
-                else {
-                    s.push(make_pair(cnt, after_down));
-                }
+                map[i][j] = 0;
+                gx = i;
+                gy = j;
             }
         }
     }
-    printf("-1");
+    dfs(0, rx, ry, bx, by, 0);
+    if (res == 987654321) {
+        cout << -1;
+    }
+    else {
+        cout << res;
+    }
 }
