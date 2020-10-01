@@ -56,9 +56,6 @@ void finball(int sx, int sy, int sdir)
                 score++;
                 if (dir == 0 || dir == 1)
                 {
-                    score++;
-                    x -= dx[dir];
-                    y -= dy[dir];
                     dir = (dir + 2) % 4;
                 }
                 else if (dir == 2)
@@ -75,9 +72,6 @@ void finball(int sx, int sy, int sdir)
                 score++;
                 if (dir == 1 || dir == 2)
                 {
-                    score++;
-                    x -= dx[dir];
-                    y -= dy[dir];
                     dir = (dir + 2) % 4;
                 }
                 else if (dir == 0)
@@ -94,9 +88,6 @@ void finball(int sx, int sy, int sdir)
                 score++;
                 if (dir == 2 || dir == 3)
                 {
-                    score++;
-                    x -= dx[dir];
-                    y -= dy[dir];
                     dir = (dir + 2) % 4;
                 }
                 else if (dir == 0)
@@ -113,9 +104,6 @@ void finball(int sx, int sy, int sdir)
                 score++;
                 if (dir == 0 || dir == 3)
                 {
-                    score++;
-                    x -= dx[dir];
-                    y -= dy[dir];
                     dir = (dir + 2) % 4;
                 }
                 else if (dir == 1)
@@ -130,24 +118,21 @@ void finball(int sx, int sy, int sdir)
             else if (map[x][y] == 5)
             {
                 score++;
-                x -= dx[dir];
-                y -= dy[dir];
                 dir = (dir + 2) % 4;
             }
             else if (map[x][y] >= 6 && map[x][y] <= 10)
             {
-                int nx = 0, ny = 0;
                 for (int i = 0; i < 2; i++)
                 {
-                    if (whall[map[x][y]][i].first != x && whall[map[x][y]][i].second != y)
+                    if (whall[map[x][y]][i].first != x || whall[map[x][y]][i].second != y)
                     {
-                        nx = whall[map[x][y]][i].first;
-                        ny = whall[map[x][y]][i].second;
+                        int nx = whall[map[x][y]][i].first;
+                        int ny = whall[map[x][y]][i].second;
+                        x = nx;
+                        y = ny;
                         break;
                     }
                 }
-                x = nx;
-                y = ny;
             }
             else if (map[x][y] == -1)
             {
@@ -157,8 +142,6 @@ void finball(int sx, int sy, int sdir)
         else
         {
             score++;
-            x -= dx[dir];
-            y -= dy[dir];
             dir = (dir + 2) % 4;
         }
         if (x == sx && y == sy)
@@ -170,16 +153,24 @@ void finball(int sx, int sy, int sdir)
 
 int main(int argc, char **argv)
 {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
     int test_case;
     int T;
     vector<pair<int, int>> start_loc;
 
+    freopen("input.txt", "r", stdin);
     cin >> T;
 
     for (test_case = 1; test_case <= T; ++test_case)
     {
         cin >> N;
         int maxv = 0;
+        start_loc.clear();
+        for (int i = 0; i < 11; i++)
+        {
+            whall[i].clear();
+        }
         for (int i = 0; i < N; i++)
         {
             for (int j = 0; j < N; j++)
